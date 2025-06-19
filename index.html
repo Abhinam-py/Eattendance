@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Falakata Poly Attendance</title>
+  <style>
+    /* Global styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      /* Adjusted background to show top portion initially */
+      background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)),
+        url('https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2083&q=80') center top/cover no-repeat fixed;
+      display: flex;
+      flex-direction: column; /* Stack items vertically */
+      align-items: center;
+      justify-content: flex-start; /* Align content to the top */
+      padding: 2rem; /* Increased padding for better spacing */
+      position: relative;
+    }
+
+    /* Animated overlay particles */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+      animation: shimmer 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+
+    /* RESPONSIVE FORM CONTAINER */
+    .form-container {
+      width: 100%;
+      max-width: 28rem; /* 448px */
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(15px);
+      border-radius: 1rem;
+      padding: 2.5rem 2rem;
+      box-shadow:
+        0 25px 50px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      animation: slideUp 0.8s ease-out;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 3rem; /* Push the form down a bit from the very top */
+      margin-left: auto; /* Center the form horizontally */
+      margin-right: auto; /* Center the form horizontally */
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(3rem);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* RESPONSIVE LOGO - Centered and named Falakata Polytechnic */
+    .logo-container {
+      text-align: center; /* Center the content */
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-container img {
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      display: block; /* Ensures proper centering with margin:auto */
+      margin: 0 auto; /* Center the image itself */
+    }
+
+    .logo-container img:hover {
+      transform: scale(1.05);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .logo-container p {
+      color: #ffffff;
+      font-size: clamp(1.2rem, 3vw, 1.5rem); /* Adjust font size */
+      font-weight: 600; /* Make it bolder */
+      margin-top: 0.5rem; /* Space between logo and text */
+      letter-spacing: 0.08rem;
+    }
+
+    /* RESPONSIVE TYPOGRAPHY */
+    .form-container h2 {
+      text-align: center;
+      color: #ffffff;
+      font-size: clamp(1.5rem, 4vw, 1.75rem);
+      font-weight: 300;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.125rem;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: clamp(0.75rem, 2vw, 0.875rem);
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+
+    /* RESPONSIVE FORM GROUPS */
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 0.5rem;
+      font-size: clamp(0.75rem, 2vw, 0.875rem);
+      text-transform: uppercase;
+      letter-spacing: 0.0625rem;
+    }
+
+    /* RESPONSIVE INPUTS */
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: clamp(0.75rem, 3vw, 1rem) clamp(1rem, 4vw, 1.25rem);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 0.5rem;
+      font-size: clamp(0.875rem, 3vw, 1rem);
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      backdrop-filter: blur(10px);
+      min-height: 3rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+      font-style: italic;
+    }
+
+    /* RESPONSIVE SELECT STYLING */
+    .form-group select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 1rem center;
+      background-repeat: no-repeat;
+      background-size: 1rem;
+      cursor: pointer;
+      padding-right: 3rem;
+    }
+
+    .form-group select option {
+      background: #2d3748;
+      color: #ffffff;
+      padding: 0.625rem;
+    }
+
+    /* RESPONSIVE CHECKBOX - Remember Me */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem; /* Reduced gap */
+      margin: 1.5rem 0; /* Reduced margin */
+      padding: 0.5rem 0; /* Reduced padding */
+      flex-wrap: wrap;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 1rem; /* Smaller width */
+      height: 1rem; /* Smaller height */
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 0.2rem; /* Slightly smaller border radius */
+      background: rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .checkbox-group input[type="checkbox"]:checked {
+      background: #e53e3e;
+      border-color: #e53e3e;
+    }
+
+    .checkbox-group input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 0.7rem; /* Smaller checkmark font size */
+      font-weight: bold;
+    }
+
+    .checkbox-group input[type="checkbox"]:hover {
+      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .checkbox-group label {
+      color: rgba(255, 255, 255, 0.8) !important; /* Slightly reduced opacity */
+      font-size: 0.8rem !important; /* Smaller font size */
+      cursor: pointer;
+      margin: 0 !important;
+      text-transform: none !important; /* Changed to none for better readability */
+      letter-spacing: 0.05rem !important; /* Slightly reduced letter spacing */
+      font-weight: 300 !important; /* Lighter font weight */
+      user-select: none;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* RESPONSIVE SUBMIT BUTTON */
+    .submit-btn,
+    button[type="submit"],
+    input[type="submit"] {
+      width: 100% !important;
+      padding: clamp(1rem, 4vw, 1.125rem) clamp(1.5rem, 5vw, 2rem) !important;
+      background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%) !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 0.5rem !important;
+      font-size: clamp(0.875rem, 3vw, 1rem) !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      position: relative !important;
+      overflow: hidden !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.0625rem !important;
+      box-shadow: 0 0.5rem 1.5rem rgba(229, 62, 62, 0.3) !important;
+      margin-top: 0.625rem !important;
+      font-family: inherit !important;
+      min-height: 3rem !important;
+    }
+
+    .submit-btn::before,
+    button[type="submit"]::before,
+    input[type="submit"]::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s;
+    }
+
+    .submit-btn:hover::before,
+    button[type="submit"]:hover::before,
+    input[type="submit"]::before {
+      left: 100%;
+    }
+
+    .submit-btn:hover,
+    button[type="submit"]:hover,
+    input[type="submit"]:hover {
+      transform: translateY(-3px) !important;
+      box-shadow: 0 0.75rem 2rem rgba(229, 62, 62, 0.4) !important;
+      background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%) !important;
+    }
+
+    .submit-btn:active,
+    button[type="submit"]:active,
+    input[type="submit"]:active {
+      transform: translateY(-1px) !important;
+    }
+
+    /* RESPONSIVE STATUS MESSAGE - Changed background color */
+    #status {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      font-weight: 400;
+      animation: fadeIn 0.5s ease;
+      backdrop-filter: blur(10px);
+      font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+      background-color: rgba(52, 152, 219, 0.2); /* A light blue shade for the status background */
+      color: #add8e6; /* Light blue text color for contrast */
+      border: 1px solid rgba(52, 152, 219, 0.3); /* Border color to match */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(0.625rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #status.success {
+      background: rgba(72, 187, 120, 0.2);
+      color: #68d391;
+      border: 1px solid rgba(72, 187, 120, 0.3);
+    }
+
+    #status.error {
+      background: rgba(245, 101, 101, 0.2);
+      color: #fc8181;
+      border: 1px solid rgba(245, 101, 101, 0.3);
+    }
+
+    /* CONDITIONAL FIELD ANIMATIONS */
+    .student-only,
+    .teacher-only,
+    .password-field, /* New class for password field */
+    .rollno-field { /* New class for roll number field */
+      animation: slideDown 0.4s ease;
+      overflow: hidden;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-1.25rem);
+      }
+      to {
+        opacity: 1;
+        max-height: 12.5rem; /* Sufficient height to show content */
+        transform: translateY(0);
+      }
+    }
+
+    /* LOADING STATE */
+    .submit-btn.loading,
+    button[type="submit"].loading,
+    input[type="submit"].loading {
+      pointer-events: none !important;
+      opacity: 0.8 !important;
+      background: rgba(229, 62, 62, 0.6) !important;
+    }
+
+    .submit-btn.loading::after,
+    button[type="submit"].loading::after,
+    input[type="submit"].loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 1.25rem;
+      height: 1.25rem;
+      margin: -0.625rem 0 0 -0.625rem;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ===== RESPONSIVE BREAKPOINTS ===== */
+
+    /* Extra Large Desktops (1400px+) */
+    @media (min-width: 87.5rem) {
+      .form-container {
+        max-width: 32rem;
+        padding: 3rem 2.5rem;
+      }
+
+      .logo-container img {
+        width: 5rem;
+        height: 5rem;
+      }
+    }
+
+    /* Large Desktops (1200px - 1399px) */
+    @media (min-width: 75rem) and (max-width: 87.4375rem) {
+      .form-container {
+        max-width: 30rem;
+        padding: 2.75rem 2.25rem;
+      }
+    }
+
+    /* Medium Desktops (992px - 1199px) */
+    @media (min-width: 62rem) and (max-width: 74.9375rem) {
+      .form-container {
+        max-width: 28rem;
+        padding: 2.5rem 2rem;
+      }
+    }
+
+    /* Small Desktops/Large Tablets (768px - 991px) */
+    @media (min-width: 48rem) and (max-width: 61.9375rem) {
+      body {
+        padding: 1.5rem;
+        background-attachment: scroll;
+      }
+
+      .form-container {
+        max-width: 26rem;
+        padding: 2.25rem 1.75rem;
+        border-radius: 0.875rem;
+      }
+
+      .form-group input,
+      .form-group select {
+        min-height: 3.25rem;
+      }
+    }
+
+    /* Tablets (576px - 767px) */
+    @media (min-width: 36rem) and (max-width: 47.9375rem) {
+      body {
+        padding: 1.25rem;
+        background-attachment: scroll;
+      }
+
+      .form-container {
+        max-width: 24rem;
+        padding: 2rem 1.5rem;
+        border-radius: 0.75rem;
+      }
+
+      .logo-container img {
+        width: 4rem;
+        height: 4rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        width: 1.375rem;
+        height: 1.375rem;
+      }
+    }
+
+    /* Large Mobile (480px - 575px) */
+    @media (min-width: 30rem) and (max-width: 35.9375rem) {
+      body {
+        padding: 1rem;
+      }
+
+      .form-container {
+        max-width: 22rem;
+        padding: 1.75rem 1.25rem;
+        border-radius: 0.625rem;
+      }
+
+      .logo-container img {
+        width: 3.5rem;
+        height: 3.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.125rem;
+      }
+
+      .checkbox-group {
+        margin: 1.5rem 0;
+      }
+    }
+
+    /* Medium Mobile (375px - 479px) */
+    @media (min-width: 23.4375rem) and (max-width: 29.9375rem) {
+      body {
+        padding: 0.875rem;
+      }
+
+      .form-container {
+        max-width: 20rem;
+        padding: 1.5rem 1rem;
+        border-radius: 0.5rem;
+      }
+
+      .logo-container {
+        margin-bottom: 1.25rem;
+      }
+
+      .logo-container img {
+        width: 3.25rem;
+        height: 3.25rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .checkbox-group {
+        margin: 1.25rem 0;
+        gap: 0.5rem;
+      }
+    }
+
+    /* Small Mobile (320px - 374px) - Form covers 90% of screen */
+    @media (max-width: 23.375rem) { /* This targets screens up to 374px */
+      body {
+        padding: 0.75rem;
+      }
+
+      .form-container {
+        width: 90%; /* Form covers 90% of the screen width */
+        max-width: 90%; /* Ensure it doesn't exceed 90% */
+        padding: 1.25rem 0.875rem;
+        border-radius: 0.5rem;
+      }
+
+      .logo-container {
+        margin-bottom: 1rem;
+      }
+
+      .logo-container img {
+        width: 3rem;
+        height: 3rem;
+      }
+
+      .form-group {
+        margin-bottom: 0.875rem;
+      }
+
+      .checkbox-group {
+        margin: 1rem 0;
+        gap: 0.5rem;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        width: 1.125rem;
+        height: 1.125rem;
+      }
+    }
+
+    /* Landscape Mobile Optimization */
+    @media (max-width: 48rem) and (orientation: landscape) and (max-height: 30rem) {
+      body {
+        padding: 0.5rem;
+        align-items: flex-start;
+      }
+
+      .form-container {
+        margin: 0.5rem auto;
+        padding: 1rem;
+        max-height: 95vh;
+        overflow-y: auto;
+      }
+
+      .logo-container {
+        margin-bottom: 0.75rem;
+      }
+
+      .logo-container img {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+
+      .form-container h2 {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .subtitle {
+        margin-bottom: 1rem;
+      }
+
+      .form-group {
+        margin-bottom: 0.75rem;
+      }
+
+      .checkbox-group {
+        margin: 0.75rem 0;
+      }
+    }
+
+    /* Touch-friendly improvements */
+    @media (hover: none) and (pointer: coarse) {
+      .form-group input,
+      .form-group select {
+        min-height: 3rem;
+        font-size: 1rem; /* Prevents zoom on iOS */
+      }
+
+      .submit-btn,
+      button[type="submit"],
+      input[type="submit"] {
+        min-height: 3rem !important;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        min-width: 1.5rem;
+        min-height: 1.5rem;
+      }
+    }
+
+    /* High DPI displays */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      .form-container {
+        border-width: 0.5px;
+      }
+    }
+
+    /* Hover effects for desktop only */
+    @media (hover: hover) and (pointer: fine) {
+      .form-group:hover input,
+      .form-group:hover select {
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-1px);
+      }
+    }
+
+    /* Focus improvements for accessibility */
+    .form-group input:focus,
+    .form-group select:focus,
+    .submit-btn:focus,
+    button[type="submit"]:focus,
+    input[type="submit"]:focus,
+    .checkbox-group input:focus {
+      outline: 2px solid rgba(255, 255, 255, 0.5);
+      outline-offset: 2px;
+    }
+
+    /* Prevent zoom on input focus for iOS */
+    @media screen and (-webkit-min-device-pixel-ratio: 0) {
+      select,
+      textarea,
+      input[type="text"],
+      input[type="password"],
+      input[type="datetime"],
+      input[type="datetime-local"],
+      input[type="date"],
+      input[type="month"],
+      input[type="time"],
+      input[type="week"],
+      input[type="number"],
+      input[type="email"],
+      input[type="url"],
+      input[type="search"],
+      input[type="tel"],
+      input[type="color"] {
+        font-size: 1rem;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      .form-container {
+        background: white;
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+
+      .form-container h2,
+      .subtitle,
+      .form-group label {
+        color: black;
+      }
+
+      .form-group input,
+      .form-group select {
+        background: white;
+        color: black;
+        border: 1px solid #ccc;
+      }
+      .status{
+        background-color: #6d9ac1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <div class="logo-container">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSxhqdJWrbvIxLsTb7kLHD3CHi-hFQ1WD8Ow&s" alt="Falakata Polytechnic Logo">
+    <p>Falakata Polytechnic</p>
+  </div>
+  <h2>Attendance System</h2>
+  <form id="attendance-form">
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" class="golkarnaip" name="name" id="name" required />
+    </div>
+
+    <div class="form-group">
+      <label>Role</label>
+      <select name="role" id="role" required>
+        <option value="">Select Role</option>
+        <option value="teacher">Teacher</option>
+        <option value="student">Student</option>
+      </select>
+    </div>
+
+    <div class="form-group password-field" style="display: none;">
+      <label>Password</label>
+      <input type="password" class="golkarnaip" name="password" id="password" />
+    </div>
+
+    <div class="form-group rollno-field" style="display: none;">
+      <label>What is your Roll No</label>
+      <input type="text" class="golkarnaip" name="rollNo" id="rollNo" />
+    </div>
+
+    <div class="form-group" id="department-group">
+      <label>Department</label>
+      <select name="dept" required>
+        <option value="">Select</option>
+        <option value="CE">CE</option>
+        <option value="ME">ME</option>
+        <option value="ETCE">ETCE</option>
+        <option value="EE">EE</option>
+        <option value="FPT">FPT</option>
+      </select>
+    </div>
+
+    <div class="form-group student-only" style="display: none;">
+      <label>Year</label>
+      <select name="year" id="year">
+        <option value="">Select</option>
+        <option value="1st">1st</option>
+        <option value="2nd">2nd</option>
+        <option value="3rd">3rd</option>
+      </select>
+    </div>
+
+    <div class="form-group student-only" style="display: none;">
+      <label>Semester</label>
+      <select name="sem" id="sem">
+        <option value="">Select year first</option>
+      </select>
+    </div>
+
+    <div class="form-group teacher-only" style="display: none;">
+      <label>Attendance Status</label>
+      <select name="status">
+        <option value="ON">ON</option>
+        <option value="OFF">OFF</option>
+      </select>
+    </div>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="rememberMe" />
+      <label for="rememberMe">Remember Me</label>
+    </div>
+
+    <div class="form-group">
+      <button type="submit">Submit</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script> 
+<script>
+  const form = document.getElementById("attendance-form");
+  const roleField = document.getElementById("role");
+  const yearField = document.getElementById("year");
+  const semField = document.getElementById("sem");
+  const teacherFields = document.querySelectorAll(".teacher-only");
+  const studentFields = document.querySelectorAll(".student-only");
+  const passwordFieldGroup = document.querySelector(".password-field");
+  const rollNoFieldGroup = document.querySelector(".rollno-field");
+  const statusElement = document.getElementById("status");
+
+  // Initialize fingerprint variable
+  let fingerprint = ""; 
+  // Load FingerprintJS asynchronously to get the device ID
+  (async () => {
+    try {
+      const fp = await FingerprintJS.load();
+      const result = await fp.get();
+      fingerprint = result.visitorId;
+      console.log("Device Fingerprint:", fingerprint); // For debugging purposes
+    } catch (error) {
+      console.error("Error loading FingerprintJS:", error);
+      statusElement.textContent = "⚠️ Could not get device ID. Attendance might be affected.";
+      statusElement.className = "status error";
+    }
+  })();
+
+  // Function to toggle field visibility based on selected role
+  function toggleRoleFields() {
+    const role = roleField.value;
+
+    // Show/hide teacher-specific fields
+    teacherFields.forEach(el => el.style.display = role === "teacher" ? "block" : "none");
+    passwordFieldGroup.style.display = role === "teacher" ? "block" : "none";
+
+    // Show/hide student-specific fields
+    studentFields.forEach(el => el.style.display = role === "student" ? "block" : "none");
+    rollNoFieldGroup.style.display = role === "student" ? "block" : "none";
+
+    // Set 'required' attribute based on visibility
+    document.getElementById("password").required = role === "teacher";
+    document.getElementById("rollNo").required = role === "student";
+    document.getElementById("year").required = role === "student";
+    document.getElementById("sem").required = role === "student";
+  }
+
+  // Event listener for role selection change
+  roleField.addEventListener("change", toggleRoleFields);
+
+  // Dynamically populate semester options based on the selected year
+  yearField.addEventListener("change", () => {
+    const year = yearField.value;
+    semField.innerHTML = `<option value="">Select</option>`; // Reset options
+    if (year === "1st") {
+      semField.innerHTML += `<option value="1st">1st Sem</option><option value="2nd">2nd Sem</option>`;
+    } else if (year === "2nd") {
+      semField.innerHTML += `<option value="3rd">3rd Sem</option><option value="4th">4th Sem</option>`;
+    } else if (year === "3rd") {
+      semField.innerHTML += `<option value="5th">5th Sem</option><option value="6th">6th Sem</option>`;
+    }
+  });
+
+  // Load saved credentials from localStorage on page load
+  window.addEventListener("DOMContentLoaded", () => {
+    const savedName = localStorage.getItem("name");
+    const savedRole = localStorage.getItem("role");
+    const savedCredential = localStorage.getItem("credential");
+
+    if (savedName) {
+      document.getElementById("name").value = savedName;
+      if (savedRole) {
+        roleField.value = savedRole;
+        toggleRoleFields(); // Call to adjust form fields based on saved role
+        if (savedRole === "teacher" && savedCredential) {
+          document.getElementById("password").value = savedCredential;
+        } else if (savedRole === "student" && savedCredential) {
+          document.getElementById("rollNo").value = savedCredential;
+        }
+      }
+      document.getElementById("rememberMe").checked = true; // Check "Remember Me" if credentials were found
+    }
+    toggleRoleFields(); // Initial call to set correct field visibility
+  });
+
+  // Handle form submission
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault(); // Prevent default form submission
+
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.classList.add('loading'); // Add loading state to button
+    submitButton.textContent = 'Submitting...';
+    statusElement.textContent = "Submitting data..."; // Update status message
+    statusElement.className = "status"; // Reset status class
+
+    // IMPORTANT: Replace this URL with your deployed Google Apps Script Web App URL
+    const url = "https://script.google.com/macros/s/AKfycbx_1Fc-KJSjWIsKEFdtkooeZ-nRp9QBpTNurZDddPvmti9-lYzwmXoWbOnOWIz2PTeK/exec"; 
+
+    const formData = new FormData(form);
+    
+    // Only append fingerprint if the role is student for cooldown check
+    if (roleField.value === "student") {
+        formData.append("fingerprint", fingerprint); 
+    }
+
+    // Conditionally manage password or rollNo based on the selected role
+    const currentRole = roleField.value;
+    if (currentRole === "teacher") {
+      formData.append("password", document.getElementById("password").value);
+      formData.delete("rollNo"); // Ensure rollNo isn't sent for teachers
+    } else if (currentRole === "student") {
+      // Roll No is already included by name="rollNo" in the input field
+      formData.delete("password"); // Ensure password isn't sent for students
+    }
+
+    // Handle "Remember Me" logic
+    if (document.getElementById("rememberMe").checked) {
+      localStorage.setItem("name", formData.get("name"));
+      localStorage.setItem("role", currentRole);
+      if (currentRole === "teacher") {
+        localStorage.setItem("credential", formData.get("password"));
+      } else if (currentRole === "student") {
+        localStorage.setItem("credential", formData.get("rollNo"));
+      }
+    } else {
+      // Clear saved data if "Remember Me" is unchecked
+      localStorage.removeItem("name");
+      localStorage.removeItem("role");
+      localStorage.removeItem("credential");
+    }
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        body: formData // Send form data as the request body
+      });
+      const msg = await res.text(); // Get response message from Apps Script
+      statusElement.textContent = msg; // Display the message
+      statusElement.className = msg.includes("✅") ? "status success" : "status error"; // Set status class for styling
+      
+      // If submission was successful, reset the form
+      if (msg.includes("✅")) {
+        form.reset();
+        roleField.value = ""; // Reset role dropdown
+        toggleRoleFields(); // Re-adjust form fields
+        semField.innerHTML = `<option value="">Select year first</option>`; // Reset semester dropdown
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      statusElement.textContent = "❌ Failed to submit. Check client's internet or Google Script deployment.";
+      statusElement.className = "status error";
+    } finally {
+      submitButton.classList.remove('loading'); // Remove loading state
+      submitButton.textContent = 'Submit'; // Restore button text
+    }
+  });
+</script>
+
+</body>
+</html>
